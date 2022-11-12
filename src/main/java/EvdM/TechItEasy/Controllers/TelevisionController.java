@@ -28,7 +28,7 @@ public class TelevisionController {
     }
 
     // een GET-request voor 1 televisie
-    @GetMapping("/television/{id}")
+    @GetMapping(path = "/television/{id}")
     public ResponseEntity<Television> getTelevision(@PathVariable int id) {
         Television t = televisions.get(id);
         return new ResponseEntity<>(t, HttpStatus.OK);
@@ -52,14 +52,15 @@ public class TelevisionController {
     }
 
     // een DELETE-request voor 1 televisie
-    @DeleteMapping("/televison/{id}")
+    @DeleteMapping("/television/delete/{id}")
     public ResponseEntity<Object> deleteTelevision(@PathVariable int t) {
         {
-            for(int i = 0; i < televisions.size(); i++){
+            if(t < televisions.size()){
                 televisions.remove(t);
                 return new ResponseEntity<>("Removed!", HttpStatus.OK);
+            }else {
+                return new ResponseEntity<>("Id is not found in database", HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity<>("Name is not found in database", HttpStatus.BAD_REQUEST);
         }
     }
 }
