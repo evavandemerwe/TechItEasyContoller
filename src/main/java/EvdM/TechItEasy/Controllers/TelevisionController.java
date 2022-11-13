@@ -53,10 +53,10 @@ public class TelevisionController {
 
     // een DELETE-request voor 1 televisie
     @DeleteMapping("/television/delete/{id}")
-    public ResponseEntity<Object> deleteTelevision(@PathVariable int t) {
+    public ResponseEntity<Object> deleteTelevision(@PathVariable int id) {
         {
-            if(t < televisions.size()){
-                televisions.remove(t);
+            if(id < televisions.size()){
+                televisions.remove(id);
                 return new ResponseEntity<>("Removed!", HttpStatus.OK);
             }else {
                 return new ResponseEntity<>("Id is not found in database", HttpStatus.BAD_REQUEST);
