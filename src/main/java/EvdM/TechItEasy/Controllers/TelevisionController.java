@@ -1,12 +1,11 @@
 package EvdM.TechItEasy.Controllers;
 
 import EvdM.TechItEasy.Model.Television;
-import com.sun.source.tree.ReturnTree;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 
 @RestController
 public class TelevisionController {
