@@ -1,6 +1,6 @@
 package EvdM.TechItEasy.Controllers;
 
-import EvdM.TechItEasy.Model.Television;
+import EvdM.TechItEasy.Models.Television;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,19 @@ public class TelevisionController {
         televisions = new ArrayList<>();
         Television t = new Television();
         t.setBrand("Philips");
-        t.setModel("Ambilight");
+        t.setType("oled");
+        t.setName("Ambilight");
+        t.setPrice(2000.00);
+        t.setAvailableSize(43.00);
+        t.setRefreshRate(100.00);
+        t.setSmartTv(true);
+        t.setWifi(true);
+        t.setVoiceControl(false);
+        t.setHdr(true);
+        t.setBluetooth(true);
+        t.setAmbiLight(true);
+        t.setOriginalStock(1000);
+        t.setSold(100);
         televisions.add(t);
     }
 
@@ -28,16 +40,16 @@ public class TelevisionController {
 
     // een GET-request voor 1 televisie
     @GetMapping(path = "/television/{id}")
-    public ResponseEntity<Television> getTelevision(@PathVariable int id) {
+    public ResponseEntity<Object> getTelevision(@PathVariable int id) {
         Television t = televisions.get(id);
-        return new ResponseEntity<>(t, HttpStatus.OK);
+        return ResponseEntity.ok("television");
     }
 
     // een POST-request voor 1 televisie
     @PostMapping("/television")
-    public ResponseEntity<Television> createTelevision(@RequestBody Television t) {
+    public ResponseEntity<Object> createTelevision(@RequestBody Television t) {
         televisions.add(t);
-        return new ResponseEntity<>(t, HttpStatus.OK);
+        return ResponseEntity.created(null).body("television");
     }
 
     // een PUT-request voor 1 televisie
@@ -45,9 +57,9 @@ public class TelevisionController {
     public ResponseEntity<Object> editTelevision(@PathVariable int id, @RequestBody Television t) {
         if (id >= 0 && id < televisions.size()) {
             televisions.set(id, t);
-            return new ResponseEntity<>(t, HttpStatus.OK);
+            return ResponseEntity.ok("television");
         }
-        return new ResponseEntity<>("Invalid id", HttpStatus.BAD_REQUEST);
+        return ResponseEntity.noContent().build();
     }
 
     // een DELETE-request voor 1 televisie
@@ -56,9 +68,9 @@ public class TelevisionController {
         {
             if(id < televisions.size()){
                 televisions.remove(id);
-                return new ResponseEntity<>("Removed!", HttpStatus.OK);
+                return ResponseEntity.ok("television");
             }else {
-                return new ResponseEntity<>("Id is not found in database", HttpStatus.BAD_REQUEST);
+                return ResponseEntity.noContent().build();
             }
         }
     }
