@@ -1,66 +1,89 @@
 package EvdM.TechItEasy.Controllers;
 
-import EvdM.TechItEasy.Model.Television;
-import com.sun.source.tree.ReturnTree;
+import EvdM.TechItEasy.Dtos.TelevisionDto;
+import EvdM.TechItEasy.Services.TelevisionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+
+import java.net.URI;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import javax.validation.Valid;
+
 
 @RestController
 public class TelevisionController {
 
-    private ArrayList<Television> televisions;
+    private final TelevisionService televisionService;
 
-    public TelevisionController() {
-        televisions = new ArrayList<>();
-        Television t = new Television();
-        t.setBrand("Philips");
-        t.setModel("Ambilight");
-        televisions.add(t);
+    //Constructor injection instead of autowired
+    public TelevisionController(TelevisionService service) {
+        this.televisionService = service;
     }
 
     // een GET-request voor alle televisies
     @GetMapping("/televisions")
-    public ResponseEntity<Object> getAllTelevisions() {
-        return new ResponseEntity<>(televisions, HttpStatus.OK);
+    public ResponseEntity<Iterable<TelevisionDto>> getAllTelevisions() {
+        return ResponseEntity.ok(televisionService.getTelevisions());
     }
 
-    // een GET-request voor 1 televisie
-    @GetMapping(path = "/television/{id}")
-    public ResponseEntity<Television> getTelevision(@PathVariable int id) {
-        Television t = televisions.get(id);
-        return new ResponseEntity<>(t, HttpStatus.OK);
+    @GetMapping("/television/{id}")
+    public ResponseEntity<Object> getTelevisionById(@PathVariable long id) {
+        return ResponseEntity.ok(televisionService.getTelevision(id));
     }
 
     // een POST-request voor 1 televisie
     @PostMapping("/television")
-    public ResponseEntity<Television> createTelevision(@RequestBody Television t) {
-        televisions.add(t);
-        return new ResponseEntity<>(t, HttpStatus.OK);
+    public ResponseEntity<String> createTelevision(@Valid @RequestBody TelevisionDto televisionDto, BindingResult br) {
+    if(br.hasErrors()){
+        //something went wrong
+        StringBuilder sb = new StringBuilder();
+            for (FieldError fe : br.getFieldErrors()) {
+                sb.append(fe.getField() + ": ");
+                sb.append(fe.getDefaultMessage());
+                sb.append("\n");
+            }
+         return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
+    } else {
+        Long createdId = televisionService.createTelevision(televisionDto);
+        URI uri = URI.create(
+                ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/televisions/" + createdId).toUriString());
+        return ResponseEntity.created(uri).body("Television created!");
+
     }
+}
 
     // een PUT-request voor 1 televisie
     @PutMapping("/television/{id}")
-    public ResponseEntity<Object> editTelevision(@PathVariable int id, @RequestBody Television t) {
-        if (id >= 0 && id < televisions.size()) {
-            televisions.set(id, t);
-            return new ResponseEntity<>(t, HttpStatus.OK);
+    public ResponseEntity<Object> updateTelevision(@PathVariable  long id, @Valid @RequestBody TelevisionDto televisionDto, BindingResult br){
+        if(br.hasErrors()) {
+            //something went wrong
+            StringBuilder sb = new StringBuilder();
+            for (FieldError fe : br.getFieldErrors()) {
+                sb.append(fe.getField() + ": ");
+                sb.append(fe.getDefaultMessage());
+                sb.append("\n");
+            }
+            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
+        }else{
+            Object updatedTelevision = televisionService.updateTelevision(id, televisionDto);
+
+            URI uri = URI.create(
+                    ServletUriComponentsBuilder
+                            .fromCurrentContextPath()
+                            .path("/televisions/").toUriString());
+            return ResponseEntity.created(uri).body("Television updated!");
         }
-        return new ResponseEntity<>("Invalid id", HttpStatus.BAD_REQUEST);
     }
+
 
     // een DELETE-request voor 1 televisie
     @DeleteMapping("/television/delete/{id}")
-    public ResponseEntity<Object> deleteTelevision(@PathVariable int id) {
-        {
-            if(id < televisions.size()){
-                televisions.remove(id);
-                return new ResponseEntity<>("Removed!", HttpStatus.OK);
-            }else {
-                return new ResponseEntity<>("Id is not found in database", HttpStatus.BAD_REQUEST);
-            }
-        }
+    public Object removeTelevision(@PathVariable long id){
+        return televisionService.deleteTelevision(id);
     }
 }
